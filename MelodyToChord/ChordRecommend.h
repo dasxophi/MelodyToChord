@@ -59,13 +59,11 @@ public:
 		for (iter = ChordAndCount.begin(); iter != ChordAndCount.end(); iter++) {
 			cout << iter->first.at(0) << " " << iter->second << "point  " << endl;
 			result.insert(pair<string,int>(iter->first.at(0), iter->second));
-			//String^ csString = msclr::interop::marshal_as<String^>(iter->first.at(0));
-			//result->Add(csString, iter->second);
 		}
-		//Dictionary<String^, int>^ result2 = marshal_as<Dictionary<String^, int>^>(result);
-		return result;
-		savenoteset.clear();
+		//savenoteset.clear();
 		ChordAndCount.clear();
+		return result;
+
 		
 	}
 

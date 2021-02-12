@@ -8,6 +8,7 @@
 #include <string>
 #include <iostream>
 #include <map>
+#include <thread>
 
 MelodyToChord::MelodyToChord() {
 	std::cout << "create!" << std::endl;
@@ -32,6 +33,17 @@ int MelodyPrintOne(std::multimap<int, int>& melodyAndTime) {
 	} else {
 		return -1;
 	
+	}
+
+}
+
+bool enterExit(map<string, int> &recommendedResult, bool exitroop) {
+	cout << "thread" << endl;
+	if (recommendedResult.empty() != true) {
+		char ch;
+		cin.get(ch);
+		if (ch == '\n') exitroop = true;
+		return exitroop;
 	}
 
 }
@@ -112,10 +124,11 @@ int MelodyToChord::Setting() {
 }
 
 map<string,int> MelodyToChord::main() {
-
+	std::cout << "main on" << std::endl;
 	std::vector<int> melodyArray;
 	static std::multimap<int, int> melodyAndTime;
-
+	std::map <string, int> recommendedResult;
+	bool exitroop = false;
 	/* 10秒 = 10000 */
 	/* 1秒 = 1000 */
 	/* 2秒 = 2000 */
@@ -128,17 +141,18 @@ map<string,int> MelodyToChord::main() {
 	int endTime = 0;
 	bool stop = false;
 
-	while (clock() < 100000) { //1小節単位
-
+	while (clock() < 20000) { //20秒
+		//std::cout << "clock" << std::endl;
 		/* MIDI入力デバイスからメッセージを取得する */
 		lRet = MIDIIn_GetMIDIMessage(pMIDIIn, byMessage, 256);
 		/* MIDIメッセージを取得した場合 */
 		if (lRet > 0) {
+			std::cout << "clock2" << std::endl;
 			/* MIDI出力デバイスからメッセージを送出する */
 			MIDIOut_PutMIDIMessage(pMIDIOut, byMessage, lRet);
 			int melodyNum = int(byMessage[1]); //入力されたメロディを整数値に変換
 			if (int(byMessage[0]) != 128) { // byMessage[0]=128は入力が終了したときに出る。よって、入力開始時のメロディだけ受け取る
-
+				std::cout << "clock3" << std::endl;
 				//cout << melodyNum << "の入力開始時間は " << clock() << " です" << endl;
 				startTime = clock();
 			}
@@ -159,7 +173,10 @@ map<string,int> MelodyToChord::main() {
 				iter = melodyAndTime.end();
 				--iter; // end()は最後の次のイテレータを返すので最後を指し示すためには-1をしなければならない
 				//cout << melodyNum << "は " <<  iter->second<< " 間押されました" << endl;
-
+				if (melodyAndTime.empty() != true)
+					recommendedResult = ChordRecommendClock(melodyAndTime, chords, stop);
+				melodyAndTime.clear();
+				stop = false;
 				startTime = 0;
 				endTime = 0;
 			}
@@ -168,10 +185,8 @@ map<string,int> MelodyToChord::main() {
 		/* MIDIメッセージを取得しなかった場合 */
 		else {
 			//Sleep(1);
-
-			return ChordRecommendClock(melodyAndTime, chords, stop);
-			stop = false;
 		}
+		
 	}
 
 
@@ -182,5 +197,6 @@ map<string,int> MelodyToChord::main() {
 	MIDIIn_Close(pMIDIIn);
 	/* MIDI出力デバイスを閉じる */
 	MIDIOut_Close(pMIDIOut);
+	return recommendedResult;
 
 }
