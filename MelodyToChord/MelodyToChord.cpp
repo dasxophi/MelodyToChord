@@ -37,15 +37,8 @@ int MelodyPrintOne(std::multimap<int, int>& melodyAndTime) {
 
 }
 
-bool enterExit(map<string, int> &recommendedResult, bool exitroop) {
-	cout << "thread" << endl;
-	if (recommendedResult.empty() != true) {
-		char ch;
-		cin.get(ch);
-		if (ch == '\n') exitroop = true;
-		return exitroop;
-	}
-
+void MelodyToChord::exitFlag() {
+	exitflag = true;
 }
 
 map<string, int> MelodyToChord::ChordRecommendClock(std::multimap<int, int>& melodyAndTime, ChordRecommend& chords, bool stop) {
@@ -141,7 +134,7 @@ map<string,int> MelodyToChord::main() {
 	int endTime = 0;
 	bool stop = false;
 
-	while (clock() < 20000) { //20秒
+	while (clock() < 200000) { //200秒
 		//std::cout << "clock" << std::endl;
 		/* MIDI入力デバイスからメッセージを取得する */
 		lRet = MIDIIn_GetMIDIMessage(pMIDIIn, byMessage, 256);
@@ -185,13 +178,21 @@ map<string,int> MelodyToChord::main() {
 		/* MIDIメッセージを取得しなかった場合 */
 		else {
 			//Sleep(1);
+			if (exitflag == true) {
+				//cout << " exit. result print " << endl;
+				/* MIDI入力デバイスを閉じる */
+				MIDIIn_Close(pMIDIIn);
+				/* MIDI出力デバイスを閉じる */
+				MIDIOut_Close(pMIDIOut);
+				return recommendedResult;
+			}
 		}
 		
 	}
 
-
 	cout << "----------input time end-------------" << endl;
-
+	
+	
 
 	/* MIDI入力デバイスを閉じる */
 	MIDIIn_Close(pMIDIIn);

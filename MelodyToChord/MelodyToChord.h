@@ -23,6 +23,7 @@ private:
 	wchar_t szDeviceName[32];
 	unsigned char byMessage[256];
 	long lRet;
+	bool exitflag = false;
 public:
 	MelodyToChord();
 	~MelodyToChord();
@@ -31,6 +32,7 @@ public:
 	int MelodyPrintOne(std::multimap<int, int>& melodyAndTime);
 	map<string, int>  main();
 	map<string, int>  ChordRecommendClock(multimap<int, int>& melodyAndTime, ChordRecommend& chords, bool stop);
+	void exitFlag();
 };
 
 
